@@ -1,4 +1,5 @@
 import { alarm } from "./alarm.js";
+import { changeActiveBtn } from "./control.js";
 import { state } from "./state.js";
 import { addZero } from "./utils.js";
 
@@ -11,7 +12,7 @@ export const showTime = (seconds) => {
 };
 
 export const startTimer = () => {
-  state.timeLeft -= 5;
+  state.timeLeft -= 1;
 
   showTime(state.timeLeft);
 
@@ -19,9 +20,23 @@ export const startTimer = () => {
     state.temerId = setTimeout(startTimer, 1000);
   }
 
-  // see on the page
-
   if (state.timeLeft <= 0) {
+    console.log(state.activeTodo);
+
+    if (state.status === "work") {
+      state.activeTodo.pomodoro += 1;
+
+      if (state.activeTodo.pomodoro % state.count) {
+        state.status = "break";
+      } else {
+        state.status = "relax";
+      }
+    } else {
+      state.status = "work";
+    }
     alarm();
+    state.timeLeft = state[state.status] * 60;
+    changeActiveBtn(state.status);
+    startTimer();
   }
 };
